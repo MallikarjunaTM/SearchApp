@@ -1,22 +1,43 @@
-import logo from './logo.svg';
 import './App.css';
+import {useState,useEffect} from 'react';
+import SearchItem from './components/SearchItem';
+
 
 function App() {
+  const [data ,setData] = useState(null);
+  const [searchValue, setSearchValue] = useState('');
+  
+  useEffect(()=>{
+      const asynCall= async ()=>{
+        const responsdata = await fetch('https://api.github.com/users');
+        const resp= await responsdata.json();
+        
+        setData(resp)
+        
+      };
+      asynCall();
+
+  },[])
+  
+  useEffect(()=>{
+
+  },[searchValue])
+
+  const changeHandler = e =>{
+    setSearchValue(e.target.value);
+  }
+  
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h4 id='search'>SearchLogin Here</h4>
+        <input type='text' name='searchValue' onChange={changeHandler}/>
+        <br/>
+        {data ? data.map(data=>{
+          let newdata=data.login.includes(searchValue) & data.login.startsWith(searchValue);
+
+          return newdata?<SearchItem key={data.id} data={data}/>:null}):null}
+        
       </header>
     </div>
   );
